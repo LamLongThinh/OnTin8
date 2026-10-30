@@ -113,6 +113,7 @@ def load_quiz_data():
 
 # ====== Tích hợp Supabase ======
 # ====== Tích hợp Supabase chuẩn khớp với bảng ontin8_results ======
+# ====== Tích hợp Supabase chuẩn xác theo đúng cấu trúc bảng ontin8_results ======
 def save_to_supabase(result_data):
     supabase_url = st.session_state.get("supabase_url", os.getenv("SUPABASE_URL", ""))
     supabase_key = st.session_state.get("supabase_key", os.getenv("SUPABASE_KEY", ""))
@@ -128,11 +129,12 @@ def save_to_supabase(result_data):
     }
     url = f"{supabase_url.rstrip('/')}/rest/v1/ontin8_results"
     
-    # Ánh xạ từ khóa tiếng Việt sang đúng tên cột tiếng Anh trong bảng ontin8_results của Supabase
+    # Chỉ định chính xác các cột có sẵn trong bảng ontin8_results[cite: 4]
     payload = {
+        "timestamp_vietnam": result_data["Thời Gian Nộp Bài"],
         "student_name": result_data["Tên Học Sinh"],
         "class_name": result_data["Lớp"],
-        "mcq_correct": int(result_data["Điểm Trắc Nghiệm"] * 5), # Quy đổi điểm về số câu đúng (40 câu / 8 điểm)
+        "mcq_correct": int(result_data["Điểm Trắc Nghiệm"] * 5),
         "mcq_total": 40,
         "written_correct": 0,
         "written_total": 2,
@@ -141,8 +143,7 @@ def save_to_supabase(result_data):
         "percent": float(result_data["Điểm Trắc Nghiệm"] / 8.0 * 100),
         "mcq_answers_json": json.dumps({}, ensure_ascii=False),
         "written_answers_json": result_data["Chi Tiết Tự Luận"],
-        "timestamp_vietnam": result_data["Thời Gian Nộp Bài"],
-        "attempt_id": f"{result_data['Tên Học Sinh']}_{int(time.time())}"
+        "review_flags": "Chờ chấm tự luận"
     }
     
     try:
