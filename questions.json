@@ -1,0 +1,442 @@
+[
+  {
+    "question": "Thông tin từ các trang blog cá nhân thường có độ tin cậy thấp hơn trang tin của các bộ ngành vì lý do nào?",
+    "options": [
+      "Blog cá nhân không thể truy cập qua Internet.",
+      "Blog chỉ hoạt động được trên điện thoại di động.",
+      "Trang blog không thể chứa tài liệu dạng văn bản.",
+      "Ai cũng có thể tạo blog và đăng tải nội dung mang tính chủ quan, chưa qua kiểm chứng chuyên môn."
+    ],
+    "answer": "Ai cũng có thể tạo blog và đăng tải nội dung mang tính chủ quan, chưa qua kiểm chứng chuyên môn.",
+    "image_base64": null
+  },
+  {
+    "question": "Khi muốn tìm kiếm thông tin số phục vụ giải quyết một nhiệm vụ học tập, công cụ nào sau đây là hiệu quả nhất?",
+    "options": [
+      "Máy tìm kiếm trực tuyến (Google, Bing...) sử dụng từ khóa phù hợp.",
+      "Phần mềm soạn thảo văn bản Word.",
+      "Phần mềm máy tính bỏ túi Calculator.",
+      "Ứng dụng xem phim offline."
+    ],
+    "answer": "Máy tìm kiếm trực tuyến (Google, Bing...) sử dụng từ khóa phù hợp.",
+    "image_base64": null
+  },
+  {
+    "question": "Bảng ghi chép kết quả tìm kiếm tài liệu cần lưu lại địa chỉ trang web (URL) và thời gian truy cập nhằm mục đích gì?",
+    "options": [
+      "Tăng dung lượng đĩa cứng của máy tính.",
+      "Làm căn cứ đánh giá độ tin cậy, tính thời sự và lập danh mục tài liệu tham khảo.",
+      "Để trang web tự động gửi quảng cáo về máy.",
+      "Bắt buộc phải có mới mở được tệp trình chiếu."
+    ],
+    "answer": "Làm căn cứ đánh giá độ tin cậy, tính thời sự và lập danh mục tài liệu tham khảo.",
+    "image_base64": null
+  },
+  {
+    "question": "Trong xử lý và biên tập nội dung bài trình chiếu, việc giới hạn \"mỗi trang nội dung không quá 6 mục, mỗi mục không quá 2 dòng\" giúp đem lại lợi ích gì?",
+    "options": [
+      "Giúp bài trình chiếu ngắn nhất có thể.",
+      "Giúp người xem dễ theo dõi, tiếp thu trọng tâm thông tin, tránh quá tải chữ trên trang slide.",
+      "Tự động sửa lỗi chính tả trong văn bản.",
+      "Đảm bảo bài trình chiếu không bị nhiễm virus."
+    ],
+    "answer": "Giúp người xem dễ theo dõi, tiếp thu trọng tâm thông tin, tránh quá tải chữ trên trang slide.",
+    "image_base64": null
+  },
+  {
+    "question": "Hành động nào sau đây là biểu hiện thiếu văn hóa khi sử dụng công nghệ kĩ thuật số?",
+    "options": [
+      "Phát trực tiếp hoặc chia sẻ video bạo lực học đường lên mạng.",
+      "Gửi bài thơ do mình sáng tác cho bạn bè.",
+      "Chia sẻ kinh nghiệm học tập trên trang cá nhân.",
+      "Trao đổi bài tập với bạn qua mạng Internet."
+    ],
+    "answer": "Phát trực tiếp hoặc chia sẻ video bạo lực học đường lên mạng.",
+    "image_base64": null
+  },
+  {
+    "question": "Khi chọn phương tiện để chia sẻ sản phẩm số (bài trình chiếu) cho các bạn trong nhóm, tiêu chí quan trọng nhất cần xem xét là gì?",
+    "options": [
+      "Chọn phương tiện có chi phí đắt nhất.",
+      "Chỉ chia sẻ bằng cách chép vào đĩa CD.",
+      "Chọn ứng dụng có nhiều trò chơi đi kèm.",
+      "Đảm bảo quyền riêng tư, bảo mật thông tin và tôn trọng quyền của người khác."
+    ],
+    "answer": "Đảm bảo quyền riêng tư, bảo mật thông tin và tôn trọng quyền của người khác.",
+    "image_base64": null
+  },
+  {
+    "question": "Hành vi nào sau đây là vi phạm pháp luật khi sử dụng công nghệ kỹ thuật số?",
+    "options": [
+      "Tự quay video bài thảo luận nhóm của mình.",
+      "Đăng bài viết do mình tự sáng tác lên mạng xã hội.",
+      "Mua bài hát có bản quyền trên cửa hàng trực tuyến để nghe.",
+      "Tải và cài đặt phần mềm bẻ khóa để không phải trả phí bản quyền."
+    ],
+    "answer": "Tải và cài đặt phần mềm bẻ khóa để không phải trả phí bản quyền.",
+    "image_base64": null
+  },
+  {
+    "question": "Việc lén ghi âm cuộc trò chuyện cá nhân của người khác rồi đăng lên mạng khi chưa được sự đồng ý của họ vi phạm điều gì?",
+    "options": [
+      "Vi phạm quyền riêng tư cá nhân và pháp luật/đạo đức.",
+      "Vi phạm tiêu chuẩn phần cứng thiết bị.",
+      "Vi phạm tốc độ đường truyền Internet.",
+      "Không vi phạm quy định nào."
+    ],
+    "answer": "Vi phạm quyền riêng tư cá nhân và pháp luật/đạo đức.",
+    "image_base64": null
+  },
+  {
+    "question": "Biểu hiện nào sau đây thể hiện hành vi thiếu văn hóa khi giao tiếp trên môi trường số?",
+    "options": [
+      "Sử dụng từ ngữ lịch sự khi bình luận.",
+      "Tôn trọng ý kiến khác biệt của bạn bè.",
+      "Sử dụng ngôn ngữ thiếu tôn trọng hoặc xúc phạm danh dự người khác trên mạng xã hội.",
+      "Trích dẫn rõ nguồn tác giả khi tham khảo bài viết."
+    ],
+    "answer": "Sử dụng ngôn ngữ thiếu tôn trọng hoặc xúc phạm danh dự người khác trên mạng xã hội.",
+    "image_base64": null
+  },
+  {
+    "question": "Hành động sao chép nguyên văn một đoạn văn trên mạng rồi dán vào bài tập của mình mà không trích dẫn nguồn, ghi tên mình là tác giả được gọi là gì?",
+    "options": [
+      "Kỹ năng tìm kiếm thông tin giỏi.",
+      "Chia sẻ tri thức cộng đồng.",
+      "Hành vi đạo văn (vi phạm bản quyền và đạo đức).",
+      "Bảo vệ dữ liệu cá nhân."
+    ],
+    "answer": "Hành vi đạo văn (vi phạm bản quyền và đạo đức).",
+    "image_base64": null
+  },
+  {
+    "question": "Biển báo cấm quay phim, chụp ảnh tại một số cơ quan, bảo tàng hay rạp chiếu phim nhằm mục đích gì?",
+    "options": [
+      "Tránh làm hỏng máy ảnh.",
+      "Bảo vệ an ninh, bí mật nhà nước hoặc bảo vệ bản quyền tác phẩm.",
+      "Tiết kiệm điện năng.",
+      "Ngăn cản người dân tiếp cận thông tin."
+    ],
+    "answer": "Bảo vệ an ninh, bí mật nhà nước hoặc bảo vệ bản quyền tác phẩm.",
+    "image_base64": null
+  },
+  {
+    "question": "Hầu hết các thông tin, tác phẩm âm nhạc, video hay phần mềm trên Internet có đặc điểm gì về mặt pháp lý?",
+    "options": [
+      "Hoàn toàn miễn phí và ai cũng có quyền sở hữu.",
+      "Đều có bản quyền và được pháp luật bảo hộ.",
+      "Tự động mất bản quyền sau 24 giờ.",
+      "Không ai quản lý."
+    ],
+    "answer": "Đều có bản quyền và được pháp luật bảo hộ.",
+    "image_base64": null
+  },
+  {
+    "question": "Khi tạo một video clip học tập để đăng lên trang web của trường, em cần xử lý thế nào đối với đoạn nhạc nền lấy từ Internet để đảm bảo đúng pháp luật và đạo đức?",
+    "options": [
+      "Tự ý lấy bài hát nổi tiếng bất kỳ mà không cần xin phép.",
+      "Sử dụng nhạc miễn phí bản quyền (Royalty-free) hoặc xin phép tác giả và ghi rõ nguồn trích dẫn nhạc nền.",
+      "Tắt tiếng toàn bộ video.",
+      "Cắt một đoạn ngắn rồi nhận là do mình tự sáng tác."
+    ],
+    "answer": "Sử dụng nhạc miễn phí bản quyền (Royalty-free) hoặc xin phép tác giả và ghi rõ nguồn trích dẫn nhạc nền.",
+    "image_base64": null
+  },
+  {
+    "question": "Nhận định nào sau đây thể hiện tính trung thực khi tạo sản phẩm số (Vlog, Poster, bài viết)?",
+    "options": [
+      "Cố tình cắt ghép hình ảnh sai sự thật để thu hút nhiều lượt xem (view).",
+      "Sử dụng thông tin chính xác, không lan truyền tin giả, tự xây dựng nội dung hoặc trích dẫn rõ ràng nguồn tài liệu tham khảo.",
+      "Sử dụng thông tin cá nhân của người khác để làm tăng độ giật gân.",
+      "Copy bài của bạn rồi đổi tên tiêu đề."
+    ],
+    "answer": "Sử dụng thông tin chính xác, không lan truyền tin giả, tự xây dựng nội dung hoặc trích dẫn rõ ràng nguồn tài liệu tham khảo.",
+    "image_base64": null
+  },
+  {
+    "question": "Mạch tích hợp (IC - Integrated Circuit) là linh kiện điện tử chính cấu tạo nên thế hệ máy tính điện tử nào?",
+    "options": [
+      "Thế hệ thứ nhất (1945 – 1955).",
+      "Thế hệ thứ hai (1955 – 1965).",
+      "Thế hệ thứ ba (1965 – 1974).",
+      "Thế hệ thứ tư (1974 – 1990)."
+    ],
+    "answer": "Thế hệ thứ ba (1965 – 1974).",
+    "image_base64": null
+  },
+  {
+    "question": "Máy tính điện tử thuộc thế hệ thứ ba nào sau đây đã được đưa vào sử dụng tại Việt Nam vào năm 1967?",
+    "options": [
+      "ENIAC.",
+      "MINSK 22.",
+      "IBM System/360.",
+      "Apple II."
+    ],
+    "answer": "IBM System/360.",
+    "image_base64": null
+  },
+  {
+    "question": "Bộ nhớ chính bằng bóng bán dẫn (transistor) là đặc điểm của thế hệ máy tính nào?",
+    "options": [
+      "Thứ nhất.",
+      "Thứ tư",
+      "Thứ ba.",
+      "Thứ hai"
+    ],
+    "answer": "Thứ hai",
+    "image_base64": null
+  },
+  {
+    "question": "Chuột máy tính và máy quét bắt đầu được sử dụng trong các hệ thống máy tính thuộc thế hệ nào?",
+    "options": [
+      "Thứ nhất.",
+      "Thứ tư.",
+      "Thứ ba.",
+      "Thứ hai"
+    ],
+    "answer": "Thứ tư.",
+    "image_base64": null
+  },
+  {
+    "question": "Năm 1833, nhà toán học Charles Babbage đã thiết kế cỗ máy tính nào được coi là tiền thân của máy tính hiện đại?",
+    "options": [
+      "Bàn tính hạt gỗ.",
+      "Máy tính Pascaline.",
+      "Máy tính điện – cơ Harvard Mark I.",
+      "Dự án máy tính đa năng."
+    ],
+    "answer": "Dự án máy tính đa năng.",
+    "image_base64": null
+  },
+  {
+    "question": "Nhà toán học John Von Neumann đã trình bày sơ đồ kiến trúc máy tính hiện đại gồm những bộ phận cơ bản nào?",
+    "options": [
+      "Bàn phím, chuột, màn hình và máy in.",
+      "Đèn điện tử chân không, rơ le điện và thẻ đục lỗ.",
+      "Bộ xử lý, bộ nhớ, các cổng kết nối thiết bị vào – ra và đường truyền.",
+      "Mạch tích hợp VLSI và bộ vi xử lý nguyên khối."
+    ],
+    "answer": "Bộ xử lý, bộ nhớ, các cổng kết nối thiết bị vào – ra và đường truyền.",
+    "image_base64": null
+  },
+  {
+    "question": "Sự phát triển của công nghệ máy tính qua các thế hệ thể hiện qua xu hướng chung nào sau đây?",
+    "options": [
+      "Kích thước ngày càng lớn hơn và tiêu thụ nhiều điện năng hơn.",
+      "Chỉ thực hiện được các phép tính cộng, trừ đơn giản.",
+      "Tốc độ tính toán chậm đi nhưng giá thành đắt hơn.",
+      "Kích thước ngày càng nhỏ gọn, tốc độ xử lý nhanh hơn, dung lượng lưu trữ lớn hơn."
+    ],
+    "answer": "Kích thước ngày càng nhỏ gọn, tốc độ xử lý nhanh hơn, dung lượng lưu trữ lớn hơn.",
+    "image_base64": null
+  },
+  {
+    "question": "Ý tưởng cơ giới hóa việc tính toán bằng hệ thống bánh răng cơ học bắt đầu từ phát minh nào?",
+    "options": [
+      "Máy tính Pascaline của Blaise Pascal năm 1642.",
+      "Bàn tính của người cổ đại.",
+      "Máy tính Harvard Mark I năm 1943.",
+      "Máy tính ENIAC năm 1945."
+    ],
+    "answer": "Máy tính Pascaline của Blaise Pascal năm 1642.",
+    "image_base64": null
+  },
+  {
+    "question": "Ví dụ nào sau đây thể hiện ứng dụng của máy tính giúp thay đổi sâu sắc lĩnh vực Y tế?",
+    "options": [
+      "Thiết bị đeo thông minh theo dõi chỉ số sức khỏe thường xuyên và tự động cảnh báo khi có bất thường.",
+      "Mạng xã hội giúp mọi người trò chuyện trực tuyến.",
+      "Xe ô tô tự lái di chuyển trên đường.",
+      "Camera an ninh công cộng ghi hình giao thông."
+    ],
+    "answer": "Thiết bị đeo thông minh theo dõi chỉ số sức khỏe thường xuyên và tự động cảnh báo khi có bất thường.",
+    "image_base64": null
+  },
+  {
+    "question": "Việc sử dụng hệ thống camera thông minh ghi nhận vi phạm giao thông tại các ngã tư thể hiện ứng dụng của máy tính trong lĩnh vực nào?",
+    "options": [
+      "Lĩnh vực An toàn xã hội.",
+      "Lĩnh vực Giáo dục.",
+      "Lĩnh vực Nông nghiệp.",
+      "Lĩnh vực Giải trí."
+    ],
+    "answer": "Lĩnh vực An toàn xã hội.",
+    "image_base64": null
+  },
+  {
+    "question": "Đặc điểm nào sau đây KHÔNG PHẢI là đặc điểm của thông tin trong môi trường số?",
+    "options": [
+      "Dễ dàng sao chép, nhân bản và chia sẻ.",
+      "Khó bị xóa bỏ hoàn toàn.",
+      "Tuyệt đối không thể bị chỉnh sửa hoặc thay đổi bởi người khác.",
+      "Được lưu trữ với dung lượng rất lớn bởi nhiều cá nhân, tổ chức."
+    ],
+    "answer": "Tuyệt đối không thể bị chỉnh sửa hoặc thay đổi bởi người khác.",
+    "image_base64": null
+  },
+  {
+    "question": "Quyền tác giả đối với thông tin số được điều chỉnh bởi yếu tố nào?",
+    "options": [
+      "Pháp luật bảo hộ.",
+      "Tự do cá nhân không cần quy định.",
+      "Quyết định của người truy cập.",
+      "Tiêu chuẩn của thiết bị phần cứng."
+    ],
+    "answer": "Pháp luật bảo hộ.",
+    "image_base64": null
+  },
+  {
+    "question": "Khi thực hiện Nhiệm vụ tìm kiếm thông tin về chủ đề \"Năng lượng tái tạo\", việc chọn lọc thông tin từ trang web có đuôi tên miền \".gov.vn\" mang lại lợi ích gì?",
+    "options": [
+      "Tìm được nhiều hình ảnh hoạt họa bắt mắt.",
+      "Không cần trích dẫn nguồn khi đưa vào bài báo cáo.",
+      "Giúp tải tài liệu nhanh hơn các trang web khác.",
+      "Thu được thông tin chính thống, đáng tin cậy từ cơ quan quản lý nhà nước."
+    ],
+    "answer": "Thu được thông tin chính thống, đáng tin cậy từ cơ quan quản lý nhà nước.",
+    "image_base64": null
+  },
+  {
+    "question": "Để bài trình chiếu về chủ đề học tập có cấu trúc mạch lạc và thuyết phục, học sinh nên sắp xếp thông tin tìm được theo thứ tự logic nào?",
+    "options": [
+      "Dàn ý -> Nội dung chi tiết các mục -> Kết luận -> Tài liệu tham khảo.",
+      "Tài liệu tham khảo -> Kết luận -> Dàn ý -> Nội dung.",
+      "Hình ảnh -> Kết luận -> Dàn ý.",
+      "Trình bày ngẫu nhiên không cần dàn ý."
+    ],
+    "answer": "Dàn ý -> Nội dung chi tiết các mục -> Kết luận -> Tài liệu tham khảo.",
+    "image_base64": null
+  },
+  {
+    "question": "Linh kiện điện tử chính được sử dụng trong thế hệ máy tính điện tử thứ nhất (1945 – 1955) là gì?",
+    "options": [
+      "Bóng bán dẫn (transistor).",
+      "Đèn điện tử chân không.",
+      "Mạch tích hợp (IC).",
+      "Mạch tích hợp cỡ rất lớn (VLSI)."
+    ],
+    "answer": "Đèn điện tử chân không.",
+    "image_base64": null
+  },
+  {
+    "question": "Chiếc máy tính điện tử thế hệ thứ hai mang tên MINSK 22 (sản xuất tại Belarus) được đưa vào sử dụng ở Việt Nam vào năm nào?",
+    "options": [
+      "Năm 1945.",
+      "Năm 1967.",
+      "Năm 1968.",
+      "Năm 1975."
+    ],
+    "answer": "Năm 1968.",
+    "image_base64": null
+  },
+  {
+    "question": "Bộ vi xử lý (CPU) nguyên khối chứa hàng chục nghìn đến hàng triệu linh kiện bán dẫn bắt đầu xuất hiện ở thế hệ máy tính nào?",
+    "options": [
+      "Thế hệ thứ hai.",
+      "Thế hệ thứ ba.",
+      "Thế hệ thứ tư.",
+      "Thế hệ thứ năm."
+    ],
+    "answer": "Thế hệ thứ tư.",
+    "image_base64": null
+  },
+  {
+    "question": "Đặc điểm nổi bật nhất của máy tính điện tử thế hệ thứ năm (1990 – nay) là gì?",
+    "options": [
+      "Sử dụng bộ nhớ trống từ và thẻ đục lỗ.",
+      "Kích thước khổng lồ chiếm cả căn phòng.",
+      "Phát triển mạnh mẽ Trí tuệ nhân tạo (AI) giúp máy tính có khả năng cảm nhận, suy luận, tương tác.",
+      "Hoạt động hoàn toàn bằng hệ thống cơ khí bánh răng."
+    ],
+    "answer": "Phát triển mạnh mẽ Trí tuệ nhân tạo (AI) giúp máy tính có khả năng cảm nhận, suy luận, tương tác.",
+    "image_base64": null
+  },
+  {
+    "question": "Chiếc máy tính cơ khí Pascaline do Blaise Pascal sáng chế năm 1642 hoạt động dựa trên nguyên lý nào?",
+    "options": [
+      "Hệ thống rơ le điện tử.",
+      "Hệ thống bánh răng cơ khí.",
+      "Đèn điện tử chân không.",
+      "Công nghệ mạch tích hợp IC."
+    ],
+    "answer": "Hệ thống bánh răng cơ khí.",
+    "image_base64": null
+  },
+  {
+    "question": "Nhà toán học John Von Neumann đã đóng góp nguyên lý hoạt động nền tảng nào cho máy tính hiện đại vào năm 1945?",
+    "options": [
+      "Phát minh ra bàn tính số học.",
+      "Khái niệm chương trình được lưu trữ.",
+      "Sáng chế ra bóng bán dẫn.",
+      "Tạo ra máy dệt đục lỗ tự động."
+    ],
+    "answer": "Khái niệm chương trình được lưu trữ.",
+    "image_base64": null
+  },
+  {
+    "question": "Từ \"chữ số\" (digit) trong tiếng Anh bắt nguồn từ \"digitus\" trong tiếng Latin có nghĩa là gì?",
+    "options": [
+      "Bánh răng.",
+      "Thước tính.",
+      "Ngón tay.",
+      "Bàn tính."
+    ],
+    "answer": "Ngón tay.",
+    "image_base64": null
+  },
+  {
+    "question": "Máy tính và công nghệ thông tin đã tác động làm thay đổi lĩnh vực Y tế của xã hội loài người như thế nào?",
+    "options": [
+      "Giải quyết quá tải trong khám chữa bệnh.",
+      "Tăng cường quốc phòng, an toàn xã hội.",
+      "Giúp phương tiện giao thông được lưu thông",
+      "Tạo ra nhiều sản phẩm số phục vụ giải trí"
+    ],
+    "answer": "Giải quyết quá tải trong khám chữa bệnh.",
+    "image_base64": null
+  },
+  {
+    "question": "Trong lĩnh vực Y tế, ví dụ nào sau đây thể hiện rõ sự thay đổi lớn lao nhờ ứng dụng thiết bị số hiện đại?",
+    "options": [
+      "Thiết bị đeo thông minh (đồng hồ thông minh) theo dõi sức khỏe thường xuyên, tự động cảnh báo bất thường đến cơ sở y tế.",
+      "Việc kê đơn thuốc bằng bút máy và sổ giấy truyền thống.",
+      "Việc lưu trữ hồ sơ bệnh án hoàn toàn bằng tủ tài liệu giấy.",
+      "Việc đo nhịp tim bằng cách bắt mạch thủ công."
+    ],
+    "answer": "Thiết bị đeo thông minh (đồng hồ thông minh) theo dõi sức khỏe thường xuyên, tự động cảnh báo bất thường đến cơ sở y tế.",
+    "image_base64": null
+  },
+  {
+    "question": "Ứng dụng nào sau đây thể hiện sự đóng góp của công nghệ máy tính trong lĩnh vực An toàn xã hội?",
+    "options": [
+      "Hệ thống camera giám sát công cộng giúp phát hiện vi phạm pháp luật và giữ gìn trật tự.",
+      "Việc ghi chép sổ nhật ký an ninh phường/xã bằng tay.",
+      "Sử dụng loa phát thanh cầm tay ở ngã tư.",
+      "Việc lực lượng chức năng đi tuần tra không sử dụng thiết bị liên lạc."
+    ],
+    "answer": "Hệ thống camera giám sát công cộng giúp phát hiện vi phạm pháp luật và giữ gìn trật tự.",
+    "image_base64": null
+  },
+  {
+    "question": "Thông tin số là gì?",
+    "options": [
+      "Thông tin được in trực tiếp trên giấy báo.",
+      "Các tín hiệu hình ảnh tự nhiên chưa qua xử lý.",
+      "Thông tin truyền miệng giữa con người với con người.",
+      "Thông tin được mã hóa thành dãy bit để chuyển vào các thiết bị kỹ thuật số và lan truyền trên môi trường số."
+    ],
+    "answer": "Thông tin được mã hóa thành dãy bit để chuyển vào các thiết bị kỹ thuật số và lan truyền trên môi trường số.",
+    "image_base64": null
+  },
+  {
+    "question": "Phát biểu nào sau đây ĐÚNG về đặc điểm của thông tin số?",
+    "options": [
+      "Thông tin số rất khó sao chép nhưng cực kỳ dễ xóa bỏ hoàn toàn.",
+      "Mọi thông tin số trên Internet đều có độ tin cậy tuyệt đối 100%.",
+      "Thông tin số chỉ được lưu trữ bởi các cơ quan nhà nước, cá nhân không thể lưu trữ.",
+      "Thông tin số dễ dàng nhân bản và lan truyền nhưng khó bị xóa bỏ hoàn toàn."
+    ],
+    "answer": "Thông tin số dễ dàng nhân bản và lan truyền nhưng khó bị xóa bỏ hoàn toàn.",
+    "image_base64": null
+  }
+]
