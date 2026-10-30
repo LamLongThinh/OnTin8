@@ -68,19 +68,28 @@ def fetch_docx_from_github():
         st.sidebar.warning(f"⚠️ Không thể tự động đồng bộ từ GitHub: {e}")
     return None
 
-# ====== HÀM XỬ LÝ FILE WORD THẾ HỆ MỚI (CHÍNH XÁC 100%) ======
+# ====== HÀM XỬ LÝ FILE WORD (ĐỌC CẢ PARAGRAPHS VÀ TABLES) ======
 def parse_quiz_from_word(file):
     doc = Document(file)
+    
+    # Thu thập toàn bộ văn bản từ cả đoạn văn và bảng biểu trong file Word
     paragraphs = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                cell_text = cell.text.strip()
+                if cell_text:
+                    for line in cell_text.split('\n'):
+                        if line.strip():
+                            paragraphs.append(line.strip())
     
     quiz = []
     essays = []
     
-    current_mode = "mcq" # mcq hoặc essay
+    current_mode = "mcq"
     current_q = None
     
     for text in paragraphs:
-        # Chuyển đổi qua phần tự luận nếu gặp tiêu đề tự luận
         if re.search(r"(II\.\s*PHẦN\s*TỰ\s*LUẬN|Tự\s*luận|Câu\s*hỏi\s*tự\s*luận)", text, flags=re.IGNORECASE):
             if current_q and current_mode == "mcq":
                 quiz.append(current_q)
@@ -89,41 +98,33 @@ def parse_quiz_from_word(file):
             continue
             
         if current_mode == "mcq":
-            # Nhận diện câu hỏi trắc nghiệm mới bắt đầu bằng "Câu X:"
             if re.match(r"^Câu\s*\d+[:.]", text, flags=re.IGNORECASE):
                 if current_q:
                     quiz.append(current_q)
                 q_text = re.sub(r"^Câu\s*\d+[:.]\s*", "", text).strip()
                 current_q = {"question": q_text, "options": [], "answer": "", "image_base64": None}
             elif current_q and re.match(r"^[A-D][\.\)]", text):
-                # Nhận diện các lựa chọn A, B, C, D
                 parts = re.split(r"^[A-D][\.\)]\s*", text)
                 opt_content = parts[1] if len(parts) > 1 else text
                 current_q["options"].append(opt_content.strip())
             elif current_q and re.search(r"đáp\s*án", text, flags=re.IGNORECASE):
-                # Nhận diện đáp án đúng
                 ans_letter = text.split(":")[-1].strip().upper()
-                # Gán nội dung đáp án tương ứng với chữ cái A, B, C, D
                 letter_map = {"A": 0, "B": 1, "C": 2, "D": 3}
                 if ans_letter in letter_map and len(current_q["options"]) > letter_map[ans_letter]:
                     current_q["answer"] = current_q["options"][letter_map[ans_letter]]
                     
         elif current_mode == "essay":
-            # Nhận diện câu tự luận
             if re.match(r"^(Câu\s*\d+|Bài\s*\d+)", text, flags=re.IGNORECASE):
                 e_text = re.sub(r"^(Câu\s*\d+|Bài\s*\d+)[:.]?\s*", "", text).strip()
                 essays.append({"question": e_text if e_text else text})
             elif essays:
-                # Nối tiếp dòng nội dung dài của câu tự luận nếu xuống dòng
                 essays[-1]["question"] += " " + text
             else:
                 essays.append({"question": text})
                 
-    # Thêm câu hỏi cuối cùng của trắc nghiệm nếu còn sót
     if current_q and current_mode == "mcq":
         quiz.append(current_q)
         
-    # Dự phòng nếu file không có câu tự luận nào
     if not essays:
         essays = [
             {"question": "Câu hỏi tự luận 1 (Giáo viên cập nhật nội dung)."},
