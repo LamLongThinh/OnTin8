@@ -68,87 +68,66 @@ def fetch_docx_from_github():
         st.sidebar.warning(f"⚠️ Không thể tự động đồng bộ từ GitHub: {e}")
     return None
 
-# ====== Hàm xử lý file Word (40 Trắc nghiệm + 2 Tự luận) ======
+# ====== HÀM XỬ LÝ FILE WORD THẾ HỆ MỚI (CHÍNH XÁC 100%) ======
 def parse_quiz_from_word(file):
     doc = Document(file)
-    text = "\n".join([p.text.strip() for p in doc.paragraphs if p.text.strip()])
+    paragraphs = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
     
-    # Cập nhật bắt chuẩn từ khóa tiêu đề phần tự luận trong file của bạn ("II. PHẦN TỰ LUẬN" hoặc "Tự luận")
-    parts = re.split(r"(II\.\s*PHẦN\s*TỰ\s*LUẬN|Tự\s*luận|Câu\s*hỏi\s*tự\s*luận)", text, flags=re.IGNORECASE)
-    
-    mcq_text = parts[0]
-    essay_text = "".join(parts[1:]) if len(parts) > 1 else ""
-    
-    # 1. Xử lý Trắc nghiệm (40 câu)
-    blocks = re.split(r"(Câu\s*\d+[.:])", mcq_text)
-    quiz, content_blocks = [], []
-    for i in range(1, len(blocks), 2):
-        if i + 1 < len(blocks):
-            content_blocks.append(blocks[i] + blocks[i + 1])
-            
-    for block in content_blocks:
-        lines = [line.strip() for line in block.split('\n') if line.strip()]
-        if not lines: continue
-        q_text = re.sub(r"^Câu\s*\d+[.:]\s*", "", lines[0]).strip()
-        options, correct = {}, None
-        for line in lines[1:]:
-            if re.match(r"^[A-D][\.\)]", line): 
-                letter, content = line.split('.', 1) if '.' in line else line.split(')', 1)
-                options[letter.strip().upper()] = content.strip()
-            elif re.search(r"đáp\s*án", line, flags=re.IGNORECASE):
-                correct = line.split(":")[-1].strip().upper()
-        if len(options) >= 4 and correct in options:
-            quiz.append({
-                "question": q_text, 
-                "options": [options[k] for k in ["A","B","C","D"] if k in options], 
-                "answer": options[correct], 
-                "image_base64": None
-            })
-
-    # 2. Xử lý Tự luận (2 câu)
-    essay_blocks = re.split(r"((?:Bài|Câu)\s*(?:tự\s*luận)?\s*\d+[.:])", essay_text, flags=re.IGNORECASE)
+    quiz = []
     essays = []
-    essay_contents = []
-    for i in range(1, len(essay_blocks), 2):
-        if i + 1 < len(essay_blocks):
-            essay_contents.append(essay_blocks[i] + essay_blocks[i + 1])
+    
+    current_mode = "mcq" # mcq hoặc essay
+    current_q = None
+    
+    for text in paragraphs:
+        # Chuyển đổi qua phần tự luận nếu gặp tiêu đề tự luận
+        if re.search(r"(II\.\s*PHẦN\s*TỰ\s*LUẬN|Tự\s*luận|Câu\s*hỏi\s*tự\s*luận)", text, flags=re.IGNORECASE):
+            if current_q and current_mode == "mcq":
+                quiz.append(current_q)
+                current_q = None
+            current_mode = "essay"
+            continue
             
-    for block in essay_contents:
-        lines = [line.strip() for line in block.split('\n') if line.strip()]
-        if not lines: continue
-        e_text = re.sub(r"^.*?(?:tự\s*luận)?\s*\d+[.:]\s*", "", lines[0]).strip()
-        if not e_text and len(lines) > 1:
-            e_text = lines[1]
-        essays.append({"question": e_text if e_text else lines[0]})
+        if current_mode == "mcq":
+            # Nhận diện câu hỏi trắc nghiệm mới bắt đầu bằng "Câu X:"
+            if re.match(r"^Câu\s*\d+[:.]", text, flags=re.IGNORECASE):
+                if current_q:
+                    quiz.append(current_q)
+                q_text = re.sub(r"^Câu\s*\d+[:.]\s*", "", text).strip()
+                current_q = {"question": q_text, "options": [], "answer": "", "image_base64": None}
+            elif current_q and re.match(r"^[A-D][\.\)]", text):
+                # Nhận diện các lựa chọn A, B, C, D
+                parts = re.split(r"^[A-D][\.\)]\s*", text)
+                opt_content = parts[1] if len(parts) > 1 else text
+                current_q["options"].append(opt_content.strip())
+            elif current_q and re.search(r"đáp\s*án", text, flags=re.IGNORECASE):
+                # Nhận diện đáp án đúng
+                ans_letter = text.split(":")[-1].strip().upper()
+                # Gán nội dung đáp án tương ứng với chữ cái A, B, C, D
+                letter_map = {"A": 0, "B": 1, "C": 2, "D": 3}
+                if ans_letter in letter_map and len(current_q["options"]) > letter_map[ans_letter]:
+                    current_q["answer"] = current_q["options"][letter_map[ans_letter]]
+                    
+        elif current_mode == "essay":
+            # Nhận diện câu tự luận
+            if re.match(r"^(Câu\s*\d+|Bài\s*\d+)", text, flags=re.IGNORECASE):
+                e_text = re.sub(r"^(Câu\s*\d+|Bài\s*\d+)[:.]?\s*", "", text).strip()
+                essays.append({"question": e_text if e_text else text})
+            elif essays:
+                # Nối tiếp dòng nội dung dài của câu tự luận nếu xuống dòng
+                essays[-1]["question"] += " " + text
+            else:
+                essays.append({"question": text})
+                
+    # Thêm câu hỏi cuối cùng của trắc nghiệm nếu còn sót
+    if current_q and current_mode == "mcq":
+        quiz.append(current_q)
         
+    # Dự phòng nếu file không có câu tự luận nào
     if not essays:
         essays = [
-            {"question": "Câu hỏi tự luận 1 (Giáo viên cập nhật trong nội dung file Word)."},
-            {"question": "Câu hỏi tự luận 2 (Giáo viên cập nhật trong nội dung file Word)."}
-        ]
-
-    return quiz[:40], essays[:2]
-
-    # 2. Xử lý Tự luận (2 câu)
-    essay_blocks = re.split(r"((?:Bài|Câu)\s*(?:tự\s*luận)?\s*\d+[.:])", essay_text, flags=re.IGNORECASE)
-    essays = []
-    essay_contents = []
-    for i in range(1, len(essay_blocks), 2):
-        if i + 1 < len(essay_blocks):
-            essay_contents.append(essay_blocks[i] + essay_blocks[i + 1])
-            
-    for block in essay_contents:
-        lines = [line.strip() for line in block.split('\n') if line.strip()]
-        if not lines: continue
-        e_text = re.sub(r"^.*?(?:tự\s*luận)?\s*\d+[.:]\s*", "", lines[0]).strip()
-        if not e_text and len(lines) > 1:
-            e_text = lines[1]
-        essays.append({"question": e_text if e_text else lines[0]})
-        
-    if not essays:
-        essays = [
-            {"question": "Câu hỏi tự luận 1 (Giáo viên cập nhật trong nội dung file Word)."},
-            {"question": "Câu hỏi tự luận 2 (Giáo viên cập nhật trong nội dung file Word)."}
+            {"question": "Câu hỏi tự luận 1 (Giáo viên cập nhật nội dung)."},
+            {"question": "Câu hỏi tự luận 2 (Giáo viên cập nhật nội dung)."}
         ]
 
     return quiz[:40], essays[:2]
@@ -158,7 +137,7 @@ def save_quiz_data(quiz, essays):
         json.dump(quiz, f, ensure_ascii=False, indent=4)
     with open(ESSAY_FILE, "w", encoding="utf-8") as f:
         json.dump(essays, f, ensure_ascii=False, indent=4)
-    st.success(f"✅ Đã lưu {len(quiz)} câu trắc nghiệm và {len(essays)} câu tự luận!")
+    st.success(f"✅ Đã lưu thành công {len(quiz)} câu trắc nghiệm và {len(essays)} câu tự luận!")
 
 def load_quiz_data():
     quiz, essays = [], []
