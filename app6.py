@@ -34,7 +34,7 @@ with col2:
     st.markdown(
         """
         <h1 style='text-align: center; font-weight: 800;'>   
-            MyHoaQUIZ
+        "NGÀY NAY HỌC TẬP - NGÀY MAI GIÚP ĐỜI"
         </h1>
         <h2 style='text-align: center; font-weight: 800;'>    
             📝 ÔN TẬP TRẮC NGHIỆM & TỰ LUẬN – TIN HỌC 8
@@ -423,7 +423,7 @@ def main():
         st.sidebar.markdown(
             """
             <h3 style='text-align: center; color: #444; font-weight: 800;'>
-                Trường THCS Mỹ Hòa
+                ÔN TẬP TRẮC NGHIỆM TỰ LUẬN
             </h3>
             <hr style='margin-top: -10px; margin-bottom: 10px;'>
             """,
