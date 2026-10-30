@@ -23,7 +23,7 @@ LOGO_PATH = "LOGO.png"
 # GitHub Repository cấu hình
 GITHUB_REPO_API = "https://api.github.com/repos/LamLongThinh/OnTin8/contents"
 
-# Thêm logo và tiêu đề (KHU VỰC CHÍNH)
+# Thêm logo và tiêu đề
 col1, col2, col3 = st.columns([5, 4, 1])
 
 if os.path.exists(LOGO_PATH):
@@ -52,101 +52,49 @@ def init_local_files():
         pd.DataFrame(columns=EXPECTED_COLUMNS).to_excel(SCORES_FILE, index=False)
 init_local_files()
 
-# ====== Đồng bộ file từ GitHub ======
-def fetch_docx_from_github():
-    """Tự động tìm và tải file .docx từ GitHub repository OnTin8"""
+# ====== Đồng bộ file JSON trắc nghiệm và Word tự luận từ GitHub ======
+def sync_files_from_github():
+    """Tự động tải questions.json và file tự luận .docx từ GitHub repository OnTin8"""
     try:
         response = requests.get(GITHUB_REPO_API, timeout=10)
         if response.status_code == 200:
             files = response.json()
+            
+            # 1. Đồng bộ file questions.json nếu có trên repo
+            json_file = next((f for f in files if f['name'] == QUIZ_FILE), None)
+            if json_file and 'download_url' in json_file:
+                json_resp = requests.get(json_file['download_url'])
+                if json_resp.status_code == 200:
+                    with open(QUIZ_FILE, "wb") as f:
+                        f.write(json_resp.content)
+            
+            # 2. Đồng bộ file tự luận .docx nếu có trên repo
             docx_file = next((f for f in files if f['name'].endswith('.docx')), None)
             if docx_file and 'download_url' in docx_file:
                 doc_resp = requests.get(docx_file['download_url'])
                 if doc_resp.status_code == 200:
-                    return BytesIO(doc_resp.content)
+                    doc = Document(BytesIO(doc_resp.content))
+                    essays = []
+                    for p in doc.paragraphs:
+                        text = p.text.strip()
+                        if text and not text.startswith("ĐỀ ÔN TẬP") and not text.startswith("I.") and not text.startswith("II."):
+                            if re.match(r"^(Câu\s*\d+|Bài\s*\d+)", text, flags=re.IGNORECASE):
+                                e_text = re.sub(r"^(Câu\s*\d+|Bài\s*\d+)[:.]?\s*", "", text).strip()
+                                essays.append({"question": e_text if e_text else text})
+                            elif essays:
+                                essays[-1]["question"] += " " + text
+                    
+                    if not essays:
+                        essays = [
+                            {"question": "Câu hỏi tự luận 1 (Cập nhật từ file Word)."},
+                            {"question": "Câu hỏi tự luận 2 (Cập nhật từ file Word)."}
+                        ]
+                    with open(ESSAY_FILE, "w", encoding="utf-8") as f:
+                        json.dump(essays[:2], f, ensure_ascii=False, indent=4)
+            return True
     except Exception as e:
-        st.sidebar.warning(f"⚠️ Không thể tự động đồng bộ từ GitHub: {e}")
-    return None
-
-# ====== HÀM XỬ LÝ FILE WORD (ĐỌC CẢ PARAGRAPHS VÀ TABLES) ======
-def parse_quiz_from_word(file):
-    doc = Document(file)
-    paragraphs = []
-    
-    # 1. Đọc toàn bộ đoạn văn bản thông thường
-    for p in doc.paragraphs:
-        if p.text.strip():
-            paragraphs.append(p.text.strip())
-            
-    # 2. Đọc toàn bộ nội dung trong các bảng (tables) nếu có
-    for table in doc.tables:
-        for row in table.rows:
-            for cell in row.cells:
-                for p in cell.paragraphs:
-                    if p.text.strip():
-                        paragraphs.append(p.text.strip())
-                        
-    quiz = []
-    essays = []
-    current_mode = "mcq"
-    current_q = None
-    
-    for text in paragraphs:
-        # Nhận diện chuyển sang phần tự luận
-        if re.search(r"(II\.\s*PHẦN\s*TỰ\s*LUẬN|Tự\s*luận|Câu\s*hỏi\s*tự\s*luận)", text, flags=re.IGNORECASE):
-            if current_q and current_mode == "mcq":
-                quiz.append(current_q)
-                current_q = None
-            current_mode = "essay"
-            continue
-            
-        if current_mode == "mcq":
-            # Bắt bất kỳ dòng nào bắt đầu bằng "Câu X" hoặc "Câu số X"
-            if re.match(r"^Câu\s*\d+", text, flags=re.IGNORECASE):
-                if current_q:
-                    quiz.append(current_q)
-                q_text = re.sub(r"^Câu\s*\d+[:.]?\s*", "", text).strip()
-                current_q = {"question": q_text, "options": [], "answer": "", "image_base64": None}
-            elif current_q and re.match(r"^[A-D][\.\)]", text):
-                # Lấy nội dung lựa chọn A, B, C, D
-                opt_content = re.sub(r"^[A-D][\.\)]\s*", "", text).strip()
-                current_q["options"].append(opt_content)
-            elif current_q and re.search(r"đáp\s*án", text, flags=re.IGNORECASE):
-                # Bắt dòng chứa đáp án
-                ans_match = re.search(r"([A-D])", text.split(":")[-1])
-                if ans_match:
-                    ans_letter = ans_match.group(1).upper()
-                    letter_map = {"A": 0, "B": 1, "C": 2, "D": 3}
-                    if ans_letter in letter_map and len(current_q["options"]) > letter_map[ans_letter]:
-                        current_q["answer"] = current_q["options"][letter_map[ans_letter]]
-                        
-        elif current_mode == "essay":
-            if re.match(r"^(Câu\s*\d+|Bài\s*\d+)", text, flags=re.IGNORECASE):
-                e_text = re.sub(r"^(Câu\s*\d+|Bài\s*\d+)[:.]?\s*", "", text).strip()
-                essays.append({"question": e_text if e_text else text})
-            elif essays:
-                essays[-1]["question"] += " " + text
-            else:
-                essays.append({"question": text})
-                
-    if current_q and current_mode == "mcq":
-        quiz.append(current_q)
-        
-    # Dự phòng nếu file thiếu tự luận
-    if not essays:
-        essays = [
-            {"question": "Câu hỏi tự luận 1 (Cập nhật từ file Word)."},
-            {"question": "Câu hỏi tự luận 2 (Cập nhật từ file Word)."}
-        ]
-
-    return quiz[:40], essays[:2]
-
-def save_quiz_data(quiz, essays):
-    with open(QUIZ_FILE, "w", encoding="utf-8") as f:
-        json.dump(quiz, f, ensure_ascii=False, indent=4)
-    with open(ESSAY_FILE, "w", encoding="utf-8") as f:
-        json.dump(essays, f, ensure_ascii=False, indent=4)
-    st.success(f"✅ Đã lưu thành công {len(quiz)} câu trắc nghiệm và {len(essays)} câu tự luận!")
+        st.sidebar.warning(f"⚠️ Không thể đồng bộ tự động từ GitHub: {e}")
+    return False
 
 def load_quiz_data():
     quiz, essays = [], []
@@ -156,6 +104,11 @@ def load_quiz_data():
     if os.path.exists(ESSAY_FILE):
         with open(ESSAY_FILE, "r", encoding="utf-8") as f:
             essays = json.load(f)
+    else:
+        essays = [
+            {"question": "Câu hỏi tự luận 1 (Cập nhật nội dung)."},
+            {"question": "Câu hỏi tự luận 2 (Cập nhật nội dung)."}
+        ]
     return quiz, essays
 
 # ====== Tích hợp Supabase ======
@@ -190,14 +143,11 @@ def student_ui():
     st.header("📚 Khu vực Kiểm tra Trắc nghiệm & Tự luận")
     
     if not os.path.exists(QUIZ_FILE):
-        github_file = fetch_docx_from_github()
-        if github_file:
-            q, e = parse_quiz_from_word(github_file)
-            save_quiz_data(q, e)
+        sync_files_from_github()
             
     quiz_raw, essay_raw = load_quiz_data()
     if not quiz_raw:
-        st.warning("⚠️ Chưa có dữ liệu đề thi. Vui lòng thông báo giáo viên cập nhật hệ thống.")
+        st.warning("⚠️ Chưa có dữ liệu câu hỏi trắc nghiệm. Vui lòng thông báo giáo viên cập nhật file `questions.json` lên GitHub.")
         return
 
     is_submitted = st.session_state.get("quiz_submitted", False)
@@ -221,11 +171,7 @@ def student_ui():
             quiz = [dict(q) for q in quiz_raw]
             random.shuffle(quiz)
             for q in quiz:
-                norm_opts = []
-                for opt in q["options"]:
-                    m = re.match(r"^[A-D][\.\)]\s*(.*)", opt)
-                    norm_opts.append(m.group(1).strip() if m else opt.strip())
-                opts_with_flag = [(text, text == q["answer"]) for text in norm_opts]
+                opts_with_flag = [(opt, opt == q["answer"]) for opt in q["options"]]
                 random.shuffle(opts_with_flag)
                 q["options"] = [t for t, _ in opts_with_flag]
                 q["answer"] = next((t for t, flag in opts_with_flag if flag), "")
@@ -408,22 +354,13 @@ def admin_ui():
         sup_key = st.text_input("Supabase API Key:", type="password", value=st.session_state.get("supabase_key", ""))
         st.session_state["supabase_key"] = sup_key
 
-    if st.button("🔄 Đồng bộ đề thi tự động từ GitHub (OnTin8)"):
-        file_obj = fetch_docx_from_github()
-        if file_obj:
-            q, e = parse_quiz_from_word(file_obj)
-            save_quiz_data(q, e)
-            st.success(f"Đã cập nhật từ GitHub thành công: {len(q)} trắc nghiệm, {len(e)} tự luận.")
+    if st.button("🔄 Đồng bộ dữ liệu từ GitHub (OnTin8)"):
+        if sync_files_from_github():
+            q, e = load_quiz_data()
+            st.success(f"Đã đồng bộ thành công: {len(q)} câu trắc nghiệm và {len(e)} câu tự luận từ GitHub!")
             st.rerun()
         else:
-            st.error("Không tìm thấy file word hoặc lỗi kết nối tới repository GitHub.")
-
-    st.markdown("Hoặc tải lên file đề Word (.docx) thủ công:")
-    up = st.file_uploader("📄 Chọn file .docx ôn tập", type=["docx"])
-    if up:
-        q, e = parse_quiz_from_word(up)
-        save_quiz_data(q, e)
-        st.success(f"Đã tải lên và lưu {len(q)} trắc nghiệm, {len(e)} tự luận.")
+            st.error("Lỗi khi đồng bộ từ GitHub.")
 
     st.subheader("2️⃣ Chấm điểm Tự luận học sinh")
     if os.path.exists(SCORES_FILE) and os.path.getsize(SCORES_FILE) > 0:
@@ -486,7 +423,7 @@ def main():
         st.sidebar.markdown(
             """
             <h3 style='text-align: center; color: #444; font-weight: 800;'>
-            ÔN TẬP TRẮC NGHIỆM - TỰ LUẬN
+                Trường THCS Mỹ Hòa
             </h3>
             <hr style='margin-top: -10px; margin-bottom: 10px;'>
             """,
