@@ -478,7 +478,7 @@ def main():
         st.sidebar.markdown(
             """
             <h3 style='text-align: center; color: #444; font-weight: 800;'>
-                Trường THCS Mỹ Hòa
+            ÔN TẬP TRẮC NGHIỆM - TỰ LUẬN
             </h3>
             <hr style='margin-top: -10px; margin-bottom: 10px;'>
             """,
