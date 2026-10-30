@@ -112,6 +112,7 @@ def load_quiz_data():
     return quiz, essays
 
 # ====== Tích hợp Supabase ======
+# ====== Tích hợp Supabase chuẩn khớp với bảng ontin8_results ======
 def save_to_supabase(result_data):
     supabase_url = st.session_state.get("supabase_url", os.getenv("SUPABASE_URL", ""))
     supabase_key = st.session_state.get("supabase_key", os.getenv("SUPABASE_KEY", ""))
@@ -127,8 +128,25 @@ def save_to_supabase(result_data):
     }
     url = f"{supabase_url.rstrip('/')}/rest/v1/ontin8_results"
     
+    # Ánh xạ từ khóa tiếng Việt sang đúng tên cột tiếng Anh trong bảng ontin8_results của Supabase
+    payload = {
+        "student_name": result_data["Tên Học Sinh"],
+        "class_name": result_data["Lớp"],
+        "mcq_correct": int(result_data["Điểm Trắc Nghiệm"] * 5), # Quy đổi điểm về số câu đúng (40 câu / 8 điểm)
+        "mcq_total": 40,
+        "written_correct": 0,
+        "written_total": 2,
+        "total_correct": int(result_data["Điểm Trắc Nghiệm"] * 5),
+        "total_questions": 42,
+        "percent": float(result_data["Điểm Trắc Nghiệm"] / 8.0 * 100),
+        "mcq_answers_json": json.dumps({}, ensure_ascii=False),
+        "written_answers_json": result_data["Chi Tiết Tự Luận"],
+        "timestamp_vietnam": result_data["Thời Gian Nộp Bài"],
+        "attempt_id": f"{result_data['Tên Học Sinh']}_{int(time.time())}"
+    }
+    
     try:
-        resp = requests.post(url, json=result_data, headers=headers, timeout=10)
+        resp = requests.post(url, json=payload, headers=headers, timeout=10)
         if resp.status_code in [200, 201, 204]:
             return True, "Lưu Supabase thành công."
         else:
