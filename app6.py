@@ -73,7 +73,8 @@ def parse_quiz_from_word(file):
     doc = Document(file)
     text = "\n".join([p.text.strip() for p in doc.paragraphs if p.text.strip()])
     
-    parts = re.split(r"(Tự\s*luận|Câu\s*hỏi\s*tự\s*luận)", text, flags=re.IGNORECASE)
+    # Cập nhật bắt chuẩn từ khóa tiêu đề phần tự luận trong file của bạn ("II. PHẦN TỰ LUẬN" hoặc "Tự luận")
+    parts = re.split(r"(II\.\s*PHẦN\s*TỰ\s*LUẬN|Tự\s*luận|Câu\s*hỏi\s*tự\s*luận)", text, flags=re.IGNORECASE)
     
     mcq_text = parts[0]
     essay_text = "".join(parts[1:]) if len(parts) > 1 else ""
@@ -103,6 +104,30 @@ def parse_quiz_from_word(file):
                 "answer": options[correct], 
                 "image_base64": None
             })
+
+    # 2. Xử lý Tự luận (2 câu)
+    essay_blocks = re.split(r"((?:Bài|Câu)\s*(?:tự\s*luận)?\s*\d+[.:])", essay_text, flags=re.IGNORECASE)
+    essays = []
+    essay_contents = []
+    for i in range(1, len(essay_blocks), 2):
+        if i + 1 < len(essay_blocks):
+            essay_contents.append(essay_blocks[i] + essay_blocks[i + 1])
+            
+    for block in essay_contents:
+        lines = [line.strip() for line in block.split('\n') if line.strip()]
+        if not lines: continue
+        e_text = re.sub(r"^.*?(?:tự\s*luận)?\s*\d+[.:]\s*", "", lines[0]).strip()
+        if not e_text and len(lines) > 1:
+            e_text = lines[1]
+        essays.append({"question": e_text if e_text else lines[0]})
+        
+    if not essays:
+        essays = [
+            {"question": "Câu hỏi tự luận 1 (Giáo viên cập nhật trong nội dung file Word)."},
+            {"question": "Câu hỏi tự luận 2 (Giáo viên cập nhật trong nội dung file Word)."}
+        ]
+
+    return quiz[:40], essays[:2]
 
     # 2. Xử lý Tự luận (2 câu)
     essay_blocks = re.split(r"((?:Bài|Câu)\s*(?:tự\s*luận)?\s*\d+[.:])", essay_text, flags=re.IGNORECASE)
