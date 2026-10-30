@@ -73,8 +73,6 @@ def parse_quiz_from_word(file):
     doc = Document(file)
     text = "\n".join([p.text.strip() for p in doc.paragraphs if p.text.strip()])
     
-    # Phân tách trắc nghiệm và tự luận
-    # Giả định phần tự luận bắt đầu bằng từ khóa "Tự luận" hoặc "Câu hỏi tự luận"
     parts = re.split(r"(Tự\s*luận|Câu\s*hỏi\s*tự\s*luận)", text, flags=re.IGNORECASE)
     
     mcq_text = parts[0]
@@ -122,7 +120,6 @@ def parse_quiz_from_word(file):
             e_text = lines[1]
         essays.append({"question": e_text if e_text else lines[0]})
         
-    # Đảm bảo mặc định có đủ cấu trúc nếu file thiếu định dạng chuẩn
     if not essays:
         essays = [
             {"question": "Câu hỏi tự luận 1 (Giáo viên cập nhật trong nội dung file Word)."},
@@ -150,7 +147,6 @@ def load_quiz_data():
 
 # ====== Tích hợp Supabase ======
 def save_to_supabase(result_data):
-    """Lưu kết quả học sinh vào bảng ontin8_results trên Supabase"""
     supabase_url = st.session_state.get("supabase_url", os.getenv("SUPABASE_URL", ""))
     supabase_key = st.session_state.get("supabase_key", os.getenv("SUPABASE_KEY", ""))
     
@@ -180,7 +176,6 @@ def save_to_supabase(result_data):
 def student_ui():
     st.header("📚 Khu vực Kiểm tra Trắc nghiệm & Tự luận")
     
-    # Tự động tải đề từ GitHub nếu chưa có dữ liệu local
     if not os.path.exists(QUIZ_FILE):
         github_file = fetch_docx_from_github()
         if github_file:
@@ -195,7 +190,6 @@ def student_ui():
     is_submitted = st.session_state.get("quiz_submitted", False)
     doing_quiz = st.session_state.get("doing_quiz", False)
 
-    # 1. ĐĂNG NHẬP THÔNG TIN
     if not is_submitted and not doing_quiz:
         st.info("Vui lòng điền đầy đủ thông tin để bắt đầu làm bài.")
         with st.form("student_login_form"):
@@ -211,7 +205,6 @@ def student_ui():
                 st.error("⚠️ Vui lòng nhập đầy đủ Họ và Tên cùng Lớp.")
                 return
 
-            # Xáo trộn trắc nghiệm
             quiz = [dict(q) for q in quiz_raw]
             random.shuffle(quiz)
             for q in quiz:
@@ -237,7 +230,6 @@ def student_ui():
     name = st.session_state.get("stu_name", "")
     clas = st.session_state.get("stu_class", "")
 
-    # 2. LÀM BÀI THI
     if doing_quiz:
         st.markdown("---")
         st.subheader(f"👋 Thí sinh: {name} - Lớp {clas}")
@@ -291,7 +283,6 @@ def student_ui():
             submitted = st.form_submit_button("✅ Nộp bài thi", type="primary")
 
         if auto_submit or submitted:
-            # Chấm điểm trắc nghiệm (8 điểm / 40 câu => 0.2 điểm/câu)
             mcq_score = 0
             total_mcq = len(quiz)
             for q in quiz:
@@ -307,7 +298,6 @@ def student_ui():
             st.balloons() 
             st.toast("🎉 Nộp bài thành công!")
             
-            # Chuẩn bị dữ liệu lưu trữ
             submission_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             essay_summary = json.dumps(st.session_state["essay_responses"], ensure_ascii=False)
             
@@ -315,13 +305,12 @@ def student_ui():
                 "Tên Học Sinh": name,
                 "Lớp": clas,
                 "Điểm Trắc Nghiệm": final_mcq_score_10,
-                "Điểm Tự Luận": 0.0, # Chờ giáo viên chấm
+                "Điểm Tự Luận": 0.0,
                 "Tổng Điểm": final_mcq_score_10,
                 "Chi Tiết Tự Luận": essay_summary,
                 "Thời Gian Nộp Bài": submission_time
             }
             
-            # Lưu vào file excel cục bộ
             try:
                 df = pd.read_excel(SCORES_FILE) if os.path.exists(SCORES_FILE) else pd.DataFrame(columns=EXPECTED_COLUMNS)
                 df = pd.concat([df, pd.DataFrame([result_record])], ignore_index=True)
@@ -329,7 +318,6 @@ def student_ui():
             except Exception as ex:
                 st.error(f"Lưu file cục bộ thất bại: {ex}")
                 
-            # Lưu lên Supabase
             ok, msg = save_to_supabase(result_record)
             if not ok:
                 st.warning(f"Lưu Supabase: {msg}")
@@ -345,110 +333,5 @@ def student_ui():
             st.rerun()
         return
 
-    # 3. XEM KẾT QUẢ VÀ ĐÁP ÁN TRẮC NGHIỆM
     if is_submitted and not doing_quiz:
         st.markdown("---")
-        st.subheader("🔍 Kết quả & Đáp án trắc nghiệm")
-        mcq_score = st.session_state.get('mcq_score', 0)
-        total = len(st.session_state.get('quiz_data', []))
-        score_10 = st.session_state.get('final_mcq_score_10', 0)
-        
-        st.success(f"Điểm trắc nghiệm: **{mcq_score}/{total} câu đúng** ({score_10}/8.0 điểm)")
-        st.info("Phần tự luận đã được ghi nhận và gửi giáo viên chấm điểm.")
-
-        quiz = st.session_state.get("quiz_data", [])
-        for idx, q in enumerate(quiz, start=1):
-            correct_answer = q['answer']
-            student_choice = st.session_state["responses"].get(q["question"])
-            is_correct = student_choice == correct_answer
-            feedback_icon = "✅" if is_correct else "❌"
-            
-            st.markdown(f"**{feedback_icon} Câu {idx}:** {q['question']}")
-            for option in q['options']:
-                color = "#e6ffe6" if option == correct_answer else ("#ffe6e6" if option == student_choice else "#f9f9f9")
-                st.markdown(f"<div style='background-color: {color}; padding: 5px; margin: 2px 0; border-radius: 4px;'>{option}</div>", unsafe_allow_html=True)
-            st.markdown("---")
-                
-        if st.button("🚀 Làm bài mới / Đăng xuất", type="primary"):
-            for key in ["quiz_data", "essay_data", "responses", "essay_responses", "start_time", "doing_quiz", "quiz_submitted", "mcq_score", "stu_name", "stu_class"]:
-                if key in st.session_state: del st.session_state[key]
-            st.rerun()
-        return
-
-# =========================================================================
-# GIAO DIỆN GIÁO VIÊN
-# =========================================================================
-def admin_ui():
-    if not st.session_state.get("admin_logged_in", False):
-        st.info("🔐 Đăng nhập khu vực Giáo viên")
-        pwd = st.text_input("Mật khẩu quản trị:", type="password")
-        if st.button("Đăng nhập", type="primary"):
-            if pwd == ADMIN_PASSWORD:
-                st.session_state.admin_logged_in = True
-                st.success("Đăng nhập thành công!")
-                st.rerun()
-            else:
-                st.error("Sai mật khẩu!")
-        return
-
-    st.success("✅ Đã đăng nhập với quyền Giáo viên.")
-    if st.button("🚪 Đăng xuất"):
-        st.session_state.admin_logged_in = False
-        st.rerun()
-
-    st.header("👨‍🏫 Bảng Điều Khiển Giáo Viên")
-    
-    # 1. Cấu hình Supabase & GitHub
-    st.subheader("1️⃣ Cấu hình hệ thống & GitHub Sync")
-    
-    col_g1, col_g2 = st.columns(2)
-    with col_g1:
-        sup_url = st.text_input("Supabase URL:", value=st.session_state.get("supabase_url", ""))
-        st.session_state["supabase_url"] = sup_url
-    with col_g2:
-        sup_key = st.text_input("Supabase API Key:", type="password", value=st.session_state.get("supabase_key", ""))
-        st.session_state["supabase_key"] = sup_key
-
-    if st.button("🔄 Đồng bộ đề thi tự động từ GitHub (OnTin8)"):
-        file_obj = fetch_docx_from_github()
-        if file_obj:
-            q, e = parse_quiz_from_word(file_obj)
-            save_quiz_data(q, e)
-            st.success(f"Đã cập nhật từ GitHub thành công: {len(q)} trắc nghiệm, {len(e)} tự luận.")
-            st.rerun()
-        else:
-            st.error("Không tìm thấy file word hoặc lỗi kết nối tới repository GitHub.")
-
-    # Tải file thủ công
-    st.markdown("Hoặc tải lên file đề Word (.docx) thủ công:")
-    up = st.file_uploader("📄 Chọn file .docx ôn tập", type=["docx"])
-    if up:
-        q, e = parse_quiz_from_word(up)
-        save_quiz_data(q, e)
-        st.success(f"Đã tải lên và lưu {len(q)} trắc nghiệm, {len(e)} tự luận.")
-
-    # 2. Chấm điểm tự luận
-    st.subheader("2️⃣ Chấm điểm Tự luận học sinh")
-    if os.path.exists(SCORES_FILE) and os.path.getsize(SCORES_FILE) > 0:
-        try:
-            df_scores = pd.read_excel(SCORES_FILE)
-            if not df_scores.empty:
-                st.dataframe(df_scores, use_container_width=True)
-                
-                student_names = df_scores["Tên Học Sinh"].tolist()
-                selected_student = st.selectbox("Chọn học sinh để chấm điểm tự luận:", student_names)
-                
-                if selected_student:
-                    stu_row = df_scores[df_scores["Tên Học Sinh"] == selected_student].iloc[0]
-                    st.write(f"**Học sinh:** {stu_row['Tên Học Sinh']} - **Lớp:** {stu_row['Lớp']}")
-                    
-                    try:
-                        essay_details = json.loads(stu_row["Chi Tiết Tự Luận"])
-                    except:
-                        essay_details = {}
-                        
-                    with st.form("grading_form"):
-                        st.markdown("##### Bài làm tự luận của học sinh:")
-                        essay_scores = []
-                        for idx, (q_text, ans_text) in enumerate(essay_details.items(), 1):
-                            st.markdown(f"**Q{idx}:** {q
