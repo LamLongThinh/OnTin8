@@ -417,10 +417,41 @@ def admin_ui():
                         mcq_val = float(stu_row["Điểm Trắc Nghiệm"])
                         total_final = round(mcq_val + total_essay_score, 2)
                         
+                        # 1. Cập nhật vào file Excel cục bộ
                         df_scores.loc[df_scores["Tên Học Sinh"] == selected_student, "Điểm Tự Luận"] = total_essay_score
                         df_scores.loc[df_scores["Tên Học Sinh"] == selected_student, "Tổng Điểm"] = total_final
                         df_scores.to_excel(SCORES_FILE, index=False)
-                        st.success(f"Đã cập nhật điểm tự luận: {total_essay_score}đ. Tổng điểm mới: {total_final}đ")
+                        
+                        # 2. CẬP NHẬT LÊN SUPABASE
+                        supabase_url = st.session_state.get("supabase_url", os.getenv("SUPABASE_URL", ""))
+                        supabase_key = st.session_state.get("supabase_key", os.getenv("SUPABASE_KEY", ""))
+                        
+                        if supabase_url and supabase_key:
+                            headers = {
+                                "apikey": supabase_key,
+                                "Authorization": f"Bearer {supabase_key}",
+                                "Content-Type": "application/json",
+                                "Prefer": "return=minimal"
+                            }
+                            # Gọi API PATCH để cập nhật các cột điểm và trạng thái theo tên học sinh
+                            url = f"{supabase_url.rstrip('/')}/rest/v1/ontin8_results?student_name=eq.{selected_student}"
+                            payload = {
+                                "written_correct": int(total_essay_score), # Lưu điểm tự luận
+                                "total_correct": int(mcq_val * 5 + total_essay_score),
+                                "percent": float(total_final / 10.0 * 100),
+                                "review_flags": "Đã chấm tự luận" # Thay đổi trạng thái thành đã chấm
+                            }
+                            try:
+                                resp = requests.patch(url, json=payload, headers=headers, timeout=10)
+                                if resp.status_code in [200, 204]:
+                                    st.success(f"Đã cập nhật điểm thành công lên Supabase! Tổng điểm: {total_final}đ")
+                                else:
+                                    st.warning(f"Lưu file Excel thành công nhưng lỗi Supabase: {resp.text}")
+                            except Exception as ex:
+                                st.error(f"Lỗi kết nối Supabase khi cập nhật điểm: {ex}")
+                        else:
+                            st.success(f"Đã cập nhật điểm cục bộ: {total_essay_score}đ. Tổng điểm: {total_final}đ")
+                            
                         time.sleep(1)
                         st.rerun()
         except Exception as e:
