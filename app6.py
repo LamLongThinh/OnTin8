@@ -33,14 +33,14 @@ if os.path.exists(LOGO_PATH):
 with col2:
     st.markdown(
         """
-        <h1 style='text-align: center; font-weight: 800;'>   
+        <h4 style='text-align: center; font-weight: 800;'>   
         "NGÀY NAY HỌC TẬP - NGÀY MAI GIÚP ĐỜI"
-        </h1>
-        <h2 style='text-align: center; font-weight: 800;'>    
+        </h4>
+        <h1 style='text-align: center; font-weight: 800;'>    
             📝 ÔN TẬP TRẮC NGHIỆM & TỰ LUẬN – TIN HỌC 8
-        </h2>
+        </h1>
         <h6 style='text-align: center; color: gray; font-weight: 700; margin-top: -10px;'> 
-            KIẾN THỨC TRỌNG TÂM HỌC KÌ
+            KIẾN THỨC TRỌNG TÂM
         </h6>
         """,
         unsafe_allow_html=True
