@@ -335,3 +335,158 @@ def student_ui():
 
     if is_submitted and not doing_quiz:
         st.markdown("---")
+        st.subheader("🔍 Kết quả & Đáp án trắc nghiệm")
+        mcq_score = st.session_state.get('mcq_score', 0)
+        total = len(st.session_state.get('quiz_data', []))
+        score_10 = st.session_state.get('final_mcq_score_10', 0)
+        
+        st.success(f"Điểm trắc nghiệm: **{mcq_score}/{total} câu đúng** ({score_10}/8.0 điểm)")
+        st.info("Phần tự luận đã được ghi nhận và gửi giáo viên chấm điểm.")
+
+        quiz = st.session_state.get("quiz_data", [])
+        for idx, q in enumerate(quiz, start=1):
+            correct_answer = q['answer']
+            student_choice = st.session_state["responses"].get(q["question"])
+            is_correct = student_choice == correct_answer
+            feedback_icon = "✅" if is_correct else "❌"
+            
+            st.markdown(f"**{feedback_icon} Câu {idx}:** {q['question']}")
+            for option in q['options']:
+                color = "#e6ffe6" if option == correct_answer else ("#ffe6e6" if option == student_choice else "#f9f9f9")
+                st.markdown(f"<div style='background-color: {color}; padding: 5px; margin: 2px 0; border-radius: 4px;'>{option}</div>", unsafe_allow_html=True)
+            st.markdown("---")
+                
+        if st.button("🚀 Làm bài mới / Đăng xuất", type="primary"):
+            for key in ["quiz_data", "essay_data", "responses", "essay_responses", "start_time", "doing_quiz", "quiz_submitted", "mcq_score", "stu_name", "stu_class"]:
+                if key in st.session_state: del st.session_state[key]
+            st.rerun()
+        return
+
+# =========================================================================
+# GIAO DIỆN GIÁO VIÊN
+# =========================================================================
+def admin_ui():
+    if not st.session_state.get("admin_logged_in", False):
+        st.info("🔐 Đăng nhập khu vực Giáo viên")
+        pwd = st.text_input("Mật khẩu quản trị:", type="password")
+        if st.button("Đăng nhập", type="primary"):
+            if pwd == ADMIN_PASSWORD:
+                st.session_state.admin_logged_in = True
+                st.success("Đăng nhập thành công!")
+                st.rerun()
+            else:
+                st.error("Sai mật khẩu!")
+        return
+
+    st.success("✅ Đã đăng nhập với quyền Giáo viên.")
+    if st.button("🚪 Đăng xuất"):
+        st.session_state.admin_logged_in = False
+        st.rerun()
+
+    st.header("👨‍🏫 Bảng Điều Khiển Giáo Viên")
+    
+    st.subheader("1️⃣ Cấu hình hệ thống & GitHub Sync")
+    
+    col_g1, col_g2 = st.columns(2)
+    with col_g1:
+        sup_url = st.text_input("Supabase URL:", value=st.session_state.get("supabase_url", ""))
+        st.session_state["supabase_url"] = sup_url
+    with col_g2:
+        sup_key = st.text_input("Supabase API Key:", type="password", value=st.session_state.get("supabase_key", ""))
+        st.session_state["supabase_key"] = sup_key
+
+    if st.button("🔄 Đồng bộ đề thi tự động từ GitHub (OnTin8)"):
+        file_obj = fetch_docx_from_github()
+        if file_obj:
+            q, e = parse_quiz_from_word(file_obj)
+            save_quiz_data(q, e)
+            st.success(f"Đã cập nhật từ GitHub thành công: {len(q)} trắc nghiệm, {len(e)} tự luận.")
+            st.rerun()
+        else:
+            st.error("Không tìm thấy file word hoặc lỗi kết nối tới repository GitHub.")
+
+    st.markdown("Hoặc tải lên file đề Word (.docx) thủ công:")
+    up = st.file_uploader("📄 Chọn file .docx ôn tập", type=["docx"])
+    if up:
+        q, e = parse_quiz_from_word(up)
+        save_quiz_data(q, e)
+        st.success(f"Đã tải lên và lưu {len(q)} trắc nghiệm, {len(e)} tự luận.")
+
+    st.subheader("2️⃣ Chấm điểm Tự luận học sinh")
+    if os.path.exists(SCORES_FILE) and os.path.getsize(SCORES_FILE) > 0:
+        try:
+            df_scores = pd.read_excel(SCORES_FILE)
+            if not df_scores.empty:
+                st.dataframe(df_scores, use_container_width=True)
+                
+                student_names = df_scores["Tên Học Sinh"].tolist()
+                selected_student = st.selectbox("Chọn học sinh để chấm điểm tự luận:", student_names)
+                
+                if selected_student:
+                    stu_row = df_scores[df_scores["Tên Học Sinh"] == selected_student].iloc[0]
+                    st.write(f"**Học sinh:** {stu_row['Tên Học Sinh']} - **Lớp:** {stu_row['Lớp']}")
+                    
+                    try:
+                        essay_details = json.loads(stu_row["Chi Tiết Tự Luận"])
+                    except:
+                        essay_details = {}
+                        
+                    with st.form("grading_form"):
+                        st.markdown("##### Bài làm tự luận của học sinh:")
+                        essay_scores = []
+                        for idx, (q_text, ans_text) in enumerate(essay_details.items(), 1):
+                            st.markdown(f"**Q{idx}:** {q_text}")
+                            st.info(f"Trả lời: {ans_text if ans_text else '(Chưa trả lời)'}")
+                            escore = st.number_input(f"Điểm câu tự luận {idx} (0 - 1.0 điểm):", 0.0, 1.0, 0.0, step=0.1, key=f"grade_es_{idx}")
+                            essay_scores.append(escore)
+                            st.markdown("---")
+                            
+                        update_grade_btn = st.form_submit_button("💾 Lưu điểm tự luận", type="primary")
+                        
+                    if update_grade_btn:
+                        total_essay_score = round(sum(essay_scores), 2)
+                        mcq_val = float(stu_row["Điểm Trắc Nghiệm"])
+                        total_final = round(mcq_val + total_essay_score, 2)
+                        
+                        df_scores.loc[df_scores["Tên Học Sinh"] == selected_student, "Điểm Tự Luận"] = total_essay_score
+                        df_scores.loc[df_scores["Tên Học Sinh"] == selected_student, "Tổng Điểm"] = total_final
+                        df_scores.to_excel(SCORES_FILE, index=False)
+                        st.success(f"Đã cập nhật điểm tự luận: {total_essay_score}đ. Tổng điểm mới: {total_final}đ")
+                        time.sleep(1)
+                        st.rerun()
+        except Exception as e:
+            st.error(f"Lỗi đọc bảng điểm: {e}")
+    else:
+        st.info("Chưa có dữ liệu bảng điểm học sinh.")
+
+    st.subheader("3️⃣ Xuất Bảng Điểm")
+    if os.path.exists(SCORES_FILE):
+        with open(SCORES_FILE, "rb") as f:
+            st.download_button("📥 Tải File Excel Bảng Điểm", f, file_name=f"BangDiem_OnTin8_{dt.date.today()}.xlsx")
+
+# ====== Điều hướng chính ======
+def main():
+    if "mode" not in st.session_state:
+        st.session_state.mode = "student"
+        
+    with st.sidebar:
+        st.sidebar.markdown(
+            """
+            <h3 style='text-align: center; color: #444; font-weight: 800;'>
+                Trường THCS Mỹ Hòa
+            </h3>
+            <hr style='margin-top: -10px; margin-bottom: 10px;'>
+            """,
+            unsafe_allow_html=True
+        )
+        st.header("⚙️ Chế độ Ứng dụng")
+        mode = st.radio("Chọn chế độ:", ["Học sinh", "Giáo viên"], index=0 if st.session_state.mode == "student" else 1)
+        st.session_state.mode = "student" if mode == "Học sinh" else "admin"
+
+    if st.session_state.mode == "student":
+        student_ui()
+    else:
+        admin_ui()
+
+if __name__ == "__main__":
+    main()
