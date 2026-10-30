@@ -71,25 +71,28 @@ def fetch_docx_from_github():
 # ====== HÀM XỬ LÝ FILE WORD (ĐỌC CẢ PARAGRAPHS VÀ TABLES) ======
 def parse_quiz_from_word(file):
     doc = Document(file)
+    paragraphs = []
     
-    # Thu thập toàn bộ văn bản từ cả đoạn văn và bảng biểu trong file Word
-    paragraphs = [p.text.strip() for p in doc.paragraphs if p.text.strip()]
+    # 1. Đọc toàn bộ đoạn văn bản thông thường
+    for p in doc.paragraphs:
+        if p.text.strip():
+            paragraphs.append(p.text.strip())
+            
+    # 2. Đọc toàn bộ nội dung trong các bảng (tables) nếu có
     for table in doc.tables:
         for row in table.rows:
             for cell in row.cells:
-                cell_text = cell.text.strip()
-                if cell_text:
-                    for line in cell_text.split('\n'):
-                        if line.strip():
-                            paragraphs.append(line.strip())
-    
+                for p in cell.paragraphs:
+                    if p.text.strip():
+                        paragraphs.append(p.text.strip())
+                        
     quiz = []
     essays = []
-    
     current_mode = "mcq"
     current_q = None
     
     for text in paragraphs:
+        # Nhận diện chuyển sang phần tự luận
         if re.search(r"(II\.\s*PHẦN\s*TỰ\s*LUẬN|Tự\s*luận|Câu\s*hỏi\s*tự\s*luận)", text, flags=re.IGNORECASE):
             if current_q and current_mode == "mcq":
                 quiz.append(current_q)
@@ -98,21 +101,25 @@ def parse_quiz_from_word(file):
             continue
             
         if current_mode == "mcq":
-            if re.match(r"^Câu\s*\d+[:.]", text, flags=re.IGNORECASE):
+            # Bắt bất kỳ dòng nào bắt đầu bằng "Câu X" hoặc "Câu số X"
+            if re.match(r"^Câu\s*\d+", text, flags=re.IGNORECASE):
                 if current_q:
                     quiz.append(current_q)
-                q_text = re.sub(r"^Câu\s*\d+[:.]\s*", "", text).strip()
+                q_text = re.sub(r"^Câu\s*\d+[:.]?\s*", "", text).strip()
                 current_q = {"question": q_text, "options": [], "answer": "", "image_base64": None}
             elif current_q and re.match(r"^[A-D][\.\)]", text):
-                parts = re.split(r"^[A-D][\.\)]\s*", text)
-                opt_content = parts[1] if len(parts) > 1 else text
-                current_q["options"].append(opt_content.strip())
+                # Lấy nội dung lựa chọn A, B, C, D
+                opt_content = re.sub(r"^[A-D][\.\)]\s*", "", text).strip()
+                current_q["options"].append(opt_content)
             elif current_q and re.search(r"đáp\s*án", text, flags=re.IGNORECASE):
-                ans_letter = text.split(":")[-1].strip().upper()
-                letter_map = {"A": 0, "B": 1, "C": 2, "D": 3}
-                if ans_letter in letter_map and len(current_q["options"]) > letter_map[ans_letter]:
-                    current_q["answer"] = current_q["options"][letter_map[ans_letter]]
-                    
+                # Bắt dòng chứa đáp án
+                ans_match = re.search(r"([A-D])", text.split(":")[-1])
+                if ans_match:
+                    ans_letter = ans_match.group(1).upper()
+                    letter_map = {"A": 0, "B": 1, "C": 2, "D": 3}
+                    if ans_letter in letter_map and len(current_q["options"]) > letter_map[ans_letter]:
+                        current_q["answer"] = current_q["options"][letter_map[ans_letter]]
+                        
         elif current_mode == "essay":
             if re.match(r"^(Câu\s*\d+|Bài\s*\d+)", text, flags=re.IGNORECASE):
                 e_text = re.sub(r"^(Câu\s*\d+|Bài\s*\d+)[:.]?\s*", "", text).strip()
@@ -125,10 +132,11 @@ def parse_quiz_from_word(file):
     if current_q and current_mode == "mcq":
         quiz.append(current_q)
         
+    # Dự phòng nếu file thiếu tự luận
     if not essays:
         essays = [
-            {"question": "Câu hỏi tự luận 1 (Giáo viên cập nhật nội dung)."},
-            {"question": "Câu hỏi tự luận 2 (Giáo viên cập nhật nội dung)."}
+            {"question": "Câu hỏi tự luận 1 (Cập nhật từ file Word)."},
+            {"question": "Câu hỏi tự luận 2 (Cập nhật từ file Word)."}
         ]
 
     return quiz[:40], essays[:2]
